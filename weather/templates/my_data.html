@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pogodynka</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div class="width container space-below column">
+        <div class="center">
+            <h1 class="space-below">Gdzie sprawdzamy pogodę?</h1>
+        </div>
+        <form class="vertical column" action="{% url 'home' %}" method="get">
+            <div class="input-container space-below">
+                <label class="space-below" for="city">Wpisz miasto:</label>
+                <input class= "center" type="text" name="city" id="city" />
+            </div>
+            <div class="input-container space-below">
+                <label class="space-below" for="country">Wpisz kod kraju:</label>
+                <input class= "center" type="text" name="country" id="country" />
+            </div>
+            <div class="input-container space-below">
+                <label class="space-below" for="units">Jednostka:</label>
+                <select id="units" name="units">
+                    <option value="metric">Metryczna</option>
+                    <option value="imperial">Imperialna</option>
+                </select>
+            </div>
+            <div class="center">
+                {% csrf_token %}
+                <button class="button space-below" type="submit">Sprawdź pogodę!</button>
+            </div>
+        </form>
+    </div>
+    <div class="width answer-box">
+        {% if data.city_name %}
+        <div class="center">
+            <h2 class="space-below">Dzisiaj w naszej progonozie pogody - {{data.city_name}}!</h2>
+        </div>
+        <div class="center">
+            <p>Aktualną pogodę można krótko opisać - {{data.weather}}.</p>
+            <p>Temperatura wyniesie {{data.temp}}C przy czym odczuwalana to {{data.temp_feel}}C.</p>
+            <p>Ciśnienie atmosferyczne wynosi {{data.pressure}} hPa.</p>
+            <p>Słońce wstało o {{data.sunrise}} a zajdzie o {{data.sunset}}.</p>
+            </div>
+            {% else %}
+            <div class="center">
+            <h2>{{ error_message}}</h2>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>
