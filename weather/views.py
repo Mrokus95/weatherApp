@@ -12,10 +12,10 @@ load_dotenv()
 
 def convert_form_unix(unix_time):
 
-    # Konwersja czasu Unix na obiekt daty i czasu
+    # Converting Unix time to a date and time object.
     datetime_object = datetime.datetime.fromtimestamp(unix_time)
 
-    # Formatowanie czasu
+    # Date formatting
     formatted_time = datetime_object.strftime('%H:%M')     
 
     return formatted_time
@@ -26,16 +26,16 @@ def has_numbers(inputString):
 def get_data(request):
 
     API_KEY = os.environ['API_KEY']
-    # Przekazana nazwa miasta z formularza
+    # The provided city name from the form.
     city = request.GET.get('city')
 
-    # Przekazany kod kraju z formularza
+    # The provided country code from the form.
     country_code = request.GET.get('country')
 
-    # Przekazana metryka z formularza
+    # The provided unit from the form.
     units = request.GET.get('units')
     
-    # Walidacja danych wsadowych
+    # Validation
     if not city:
         error_message = "Wpisz miasto i kod kraju by zobaczyć pogodę!"
         return render(request, 'my_data.html', {'error_message': error_message})
@@ -48,28 +48,28 @@ def get_data(request):
     else:
         pass
 
-    # Standaryzacja otrzymanej nazwy miasta
+    # Standardization of the received city name.
     city = city.title()
 
-    # Standaryzacja otrzymanego kodu kraju
+    # Standardization of the received country code.
     country_code = country_code.upper()
 
-    # Sprawdzenie, czy istnieje już wpis w bazie danych dla danego miasta w ciągu ostatniej godziny
+    # Checking if there is already a record in the database for the given city within the last hour.
     last_hour = timezone.now() - timedelta(hours=1)
     existing_data = WeatherHistory.objects.filter(city_name=city, country=country_code, unit=units, question_time__gte=last_hour).first()
 
     if existing_data:
-        # Jeśli istnieją dane w bazie, zwróć je
+        # If there is existing data in the database, return it.
         return render(request, 'my_data.html', {'data': existing_data})    
 
 
-    # Tworzenie zapytania url
+    # Create URL request
     url = f'https://api.openweathermap.org/data/2.5/weather?q={city},{country_code}&units={units}&lang=pl&appid={API_KEY}' 
 
     response = requests.get(url)
 
-    if response.status_code == 200: # sprawdzenie, czy żądanie było udane
-        data = response.json()  # przetworzenie odpowiedzi JSON na obiekt Pythona
+    if response.status_code == 200: # Data retrieval was successful
+        data = response.json()  # Process the JSON response into a Python object
 
         formated_data = {
         'city_name' : data['name'],
@@ -82,7 +82,7 @@ def get_data(request):
         'country': country_code,
         'unit' : units}
 
-        # Zapisanie danych w bazie danych
+        # Save date in database
         WeatherHistory.objects.create(**formated_data)
 
         return render(request, 'my_data.html', {'data': formated_data})   

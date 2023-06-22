@@ -17,7 +17,7 @@ class WeatherHistory(models.Model):
     question_time= models.DateTimeField(auto_now_add=True)
 
     class Meta():
-        ordering = ('-question_time',) # definiuje kolejność sortowania postów na podstawie pola published w porządku malejącym.
+        ordering = ('-question_time',) # It define the sorting order of posts based on their question_time in descending order.
     
     def __str__(self):
         return f'{self.city_name} - {self.question_time}'
